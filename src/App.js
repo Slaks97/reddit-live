@@ -1,23 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
-
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 function App() {
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get('https://www.reddit.com/r/reactjs.json');
+        const data = response.data.data.children.map(obj => obj.data);
+        setPosts(data);
+      } catch (error) {
+        console.log('Error fetching data:', error);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>/r/reactjs</h1>
+      <ul>
+        {posts.map(post => (
+          <li key={post.id}><a href={post.url}>{post.title}</a>{post.score}{post.author_fullname}</li>
+        ))}
+      </ul>
     </div>
   );
 }
